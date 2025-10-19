@@ -1,0 +1,5 @@
+# .gitignore file
+
+# Environment variables
+.env
+.venv
