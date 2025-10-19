@@ -53,6 +53,11 @@ paramsAviacao = {
 
 # --- Funções ---
 
+sqlInsertCompanhia = "INSERT IGNORE INTO companhia (icao, nome) VALUES (%s, %s);"
+sqlInsertAeroporto = "INSERT IGNORE INTO aeroporto (icao, nome) VALUES (%s, %s);"
+sqlInsertVoo = "INSERT IGNORE INTO voo (icao, aeroporto_icao, companhia_icao, h_chegada, data_chegada) VALUES (%s, %s, %s, %s, %s);"
+sqlInsertHotel = "INSERT IGNORE INTO hotel (id, nome, rua1, rua2, cidade, estado, pais, cep) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
+
 def insertCompanhia(cursor, dados):
     companhiaAtual = []
 
@@ -97,13 +102,10 @@ def main():
 
             print("Conexão com o banco de dados estabelecida")
 
+            # --- Passando os dados da API para o banco ---
+
             cursor = conexao.cursor()
             
-            sqlInsertCompanhia = "INSERT IGNORE INTO companhia (icao, nome) VALUES (%s, %s);"
-            sqlInsertAeroporto = "INSERT IGNORE INTO aeroporto (icao, nome) VALUES (%s, %s);"
-            sqlInsertVoo = "INSERT IGNORE INTO voo (icao, aeroporto_icao, companhia_icao, h_chegada, data_chegada) VALUES (%s, %s, %s, %s, %s);"
-            sqlInsertHotel = "INSERT IGNORE INTO hotel (id, nome, rua1, rua2, cidade, estado, pais, cep) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
-
             for aeroporto in aeroportos:
                 paramsAviacao['arr_icao'] = aeroporto['icao']
                 paramsAviacao['offset'] = 0
@@ -141,8 +143,17 @@ def main():
             conexao.close()
             print("Conexão com o banco de dados encerrada")
 
-schedule.every(6).hours.do(main)
+print('Rodando o programa!')
+main()
+
+# --- Definindo scheduler ---
+
+schedule.every().day.at('00:00').do(main)
+schedule.every().day.at('06:00').do(main)
+schedule.every().day.at('12:00').do(main)
+schedule.every().day.at('18:00').do(main)
 
 while True:
     schedule.run_pending()
     time.sleep(1)
+
