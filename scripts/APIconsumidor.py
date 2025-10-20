@@ -9,9 +9,9 @@ from dotenv import load_dotenv
 # Acessando os dados sensíveis
 load_dotenv()
 
-apiKeyHotel = os.getenv("API_KEY_HOTEL")
 apiKeyAviacao = os.getenv("API_KEY_AVIACAO")
 dbKey = os.getenv('DB_KEY')
+dbHost = os.getenv('DB_HOST')
 
 # --- Definindo info dos tres aeroportos do RJ ---
 
@@ -34,15 +34,6 @@ aeroportos = [galeao, santosDumont, jacarepagua]
 
 # --- Definindo as URLs e parâmetros das APIs ---
 
-# Tripadvisor API
-urlHotel = 'https://api.content.tripadvisor.com/api/v1/location/nearby_search'
-paramsHotel = {
-    'latLong': galeao['latLong'],
-    'radius': 10,
-    'radiusUnit': 'km',
-    'api_key': apiKeyHotel
-}
-
 # Aviationstack API
 urlAviacao = 'https://api.aviationstack.com/v1/flights'
 paramsAviacao = {
@@ -56,7 +47,6 @@ paramsAviacao = {
 sqlInsertCompanhia = "INSERT IGNORE INTO companhia (icao, nome) VALUES (%s, %s);"
 sqlInsertAeroporto = "INSERT IGNORE INTO aeroporto (icao, nome) VALUES (%s, %s);"
 sqlInsertVoo = "INSERT IGNORE INTO voo (icao, aeroporto_icao, companhia_icao, h_chegada, data_chegada) VALUES (%s, %s, %s, %s, %s);"
-sqlInsertHotel = "INSERT IGNORE INTO hotel (id, nome, rua1, rua2, cidade, estado, pais, cep) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
 
 def insertCompanhia(cursor, dados):
     companhiaAtual = []
@@ -91,7 +81,7 @@ def insertVoo(cursor, dados):
 def main():
     try:
         conexao = mysql.connector.connect(
-            host = '34.39.234.170',
+            host = dbHost,
             port = 3306,
             user = 'root',
             password = dbKey,
